@@ -31,10 +31,6 @@ export default function ParticipantBlock({
     ? "sm:flex-row flex-col"
     : "sm:flex-row-reverse flex-col";
 
-  const justify = isLeft
-    ? "sm:justify-start justify-center"
-    : "sm:justify-end justify-center";
-
   const blockClass = [
     "flex flex-col gap-3 w-full sm:w-1/2 overflow-hidden rounded-lg p-4 transition-all duration-300",
     alignment,
