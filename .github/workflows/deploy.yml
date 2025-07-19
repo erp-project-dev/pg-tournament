@@ -1,4 +1,5 @@
 name: Deploy to GitHub Pages
+description: Build and deploy the static website to GitHub Pages using Vite and custom data from Google Sheets.
 
 on:
   push:

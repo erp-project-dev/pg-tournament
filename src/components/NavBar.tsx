@@ -6,11 +6,11 @@ export default function NavBar() {
     <nav className="border-b border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 flex items-center justify-center space-x-8">
         <div className="flex space-x-6 text-sm font-medium text-gray-300">
-          <Link to="/ranking" className="hover:text-white transition">
-            Ranking
-          </Link>
           <Link to="/competition" className="hover:text-white transition">
             Competencia
+          </Link>
+          <Link to="/ranking" className="hover:text-white transition">
+            Ranking
           </Link>
         </div>
 
