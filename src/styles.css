@@ -9,37 +9,18 @@
   --on-brand: #032a30;
   --night: #061416;
 
-  --bg: #f4f8f8;
-  --sheet: #ffffff;
-  --ink: #0f1b1d;
-  --muted: #566a6d;
-  --line: #dbe5e6;
-  --accent: #0a7c8b; /* cyan dark enough to read on paper */
-
-  --display: "Archivo", "Arial Narrow", Impact, sans-serif;
-  --body: "Archivo", -apple-system, "Segoe UI", Roboto, sans-serif;
-  --mono: "Martian Mono", ui-monospace, Menlo, monospace;
-
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #081113;
-    --sheet: #0f1c1f;
-    --ink: #eaf4f5;
-    --muted: #93a9ac;
-    --line: #1f3236;
-    --accent: #3fd7e8;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
+  /* Always dark: the contest's identity is a dark stage */
   --bg: #081113;
   --sheet: #0f1c1f;
   --ink: #eaf4f5;
   --muted: #93a9ac;
   --line: #1f3236;
   --accent: #3fd7e8;
+
+  --display: "Archivo", "Arial Narrow", Impact, sans-serif;
+  --body: "Archivo", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "Martian Mono", ui-monospace, Menlo, monospace;
+
   color-scheme: dark;
 }
 
