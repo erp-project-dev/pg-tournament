@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowDownToLine,
   ArrowUpRight,
@@ -10,8 +10,11 @@ import {
   Crosshair,
   Gavel,
   Instagram,
+  LoaderCircle,
   MapPin,
   Music,
+  Pause,
+  Play,
   Send,
   SlidersVertical,
   Smartphone,
@@ -74,6 +77,11 @@ const CRITERIA = [
   { icon: TrendingUp, title: "Estructura", body: "Desarrollo, clímax y cierre del solo." },
 ];
 
+const STAGES = [
+  { icon: CalendarClock, title: "Participaciones", body: "Se aceptan videos hasta el 20 de octubre." },
+  { icon: Gavel, title: "Jurado", body: "El jurado califica cada video, uno por uno, y anunciará la fecha de resultados." },
+];
+
 const TERMS = [
   { icon: CalendarX2, term: "Fecha límite", body: "20 de octubre, hasta las 23:59 (hora de Lima)." },
   { icon: MapPin, term: "Quién participa", body: "Residentes en Perú o personas con cuenta activa de Yape o Plin." },
@@ -96,12 +104,13 @@ function useCountdown() {
   };
 }
 
-function Countdown() {
-  const { closed, days, hours, minutes, seconds } = useCountdown();
+type CountdownState = ReturnType<typeof useCountdown>;
+
+function Countdown({ closed, days, hours, minutes, seconds }: CountdownState) {
   if (closed) {
     return (
       <div className="countdown is-closed">
-        <CalendarClock aria-hidden="true" />
+        <Gavel aria-hidden="true" />
         Participaciones cerradas. El jurado está calificando.
       </div>
     );
@@ -120,6 +129,70 @@ function Countdown() {
         <span><b>{pad(seconds)}</b>seg</span>
       </span>
     </div>
+  );
+}
+
+function formatTime(t: number) {
+  const s = Math.max(0, Math.floor(t));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+function ListenButton() {
+  const audio = useRef<HTMLAudioElement>(null);
+  const [state, setState] = useState<"idle" | "loading" | "playing" | "paused">("idle");
+  const [time, setTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const toggle = () => {
+    const el = audio.current;
+    if (!el) return;
+    if (el.paused) {
+      if (state === "idle") setState("loading");
+      void el.play().catch(() => setState("idle"));
+    } else {
+      el.pause();
+    }
+  };
+
+  const playing = state === "playing";
+  const progress = duration ? (time / duration) * 100 : 0;
+
+  return (
+    <button
+      type="button"
+      className="btn btn-listen"
+      onClick={toggle}
+      aria-pressed={playing}
+      style={{ "--progress": `${progress}%` } as React.CSSProperties}
+    >
+      {state === "loading" ? (
+        <LoaderCircle aria-hidden="true" className="spin" />
+      ) : playing ? (
+        <Pause aria-hidden="true" />
+      ) : (
+        <Play aria-hidden="true" />
+      )}
+      {playing ? "Pausar" : state === "paused" ? "Continuar" : "Escuchar la pista"}
+      {state !== "idle" && duration > 0 && (
+        <span className="btn-meta">
+          {formatTime(time)} / {formatTime(Math.round(duration))}
+        </span>
+      )}
+      <audio
+        ref={audio}
+        src={TRACK_URL}
+        preload="none"
+        onPlaying={() => setState("playing")}
+        onPause={() => setState("paused")}
+        onWaiting={() => setState("loading")}
+        onEnded={() => {
+          setState("idle");
+          setTime(0);
+        }}
+        onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+      />
+    </button>
   );
 }
 
@@ -177,7 +250,20 @@ function CaptionBuilder() {
   );
 }
 
+function FollowButton({ label }: { label: string }) {
+  return (
+    <a className="btn btn-outline" href={INSTAGRAM_URL} target="_blank" rel="noopener">
+      <Instagram aria-hidden="true" />
+      {label}
+      <ArrowUpRight aria-hidden="true" className="btn-trail" />
+    </a>
+  );
+}
+
 export default function Landing() {
+  const countdown = useCountdown();
+  const { closed } = countdown;
+
   return (
     <>
       <header className="hero">
@@ -195,7 +281,6 @@ export default function Landing() {
 
         <div className="wrap hero-grid">
           <div className="hero-body">
-            <p className="eyebrow">Peru Guitar presenta · 2.ª edición</p>
             <h1>
               <span className="h1-small">II Concurso de</span>
               <span className="h1-line">Solos de</span>
@@ -205,16 +290,20 @@ export default function Landing() {
               Una pista, tu solo y un Reel. Los <strong>3 mejores guitarristas</strong> ganan{" "}
               <strong>premios en efectivo</strong>.
             </p>
-            <Countdown />
+            <Countdown {...countdown} />
             <div className="ctas">
-              <a className="btn btn-primary" href={TRACK_URL} download={TRACK_FILENAME}>
-                <ArrowDownToLine aria-hidden="true" />
-                Descargar la pista
-                <span className="btn-meta">{TRACK_META}</span>
-              </a>
-              <a className="btn btn-outline" href="#participar">
-                Cómo participar
-              </a>
+              {closed ? (
+                <FollowButton label="Sigue los resultados en @peruguitar" />
+              ) : (
+                <>
+                  <a className="btn btn-primary" href={TRACK_URL} download={TRACK_FILENAME}>
+                    <ArrowDownToLine aria-hidden="true" />
+                    Descargar la pista
+                    <span className="btn-meta">{TRACK_META}</span>
+                  </a>
+                  <ListenButton />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -266,26 +355,27 @@ export default function Landing() {
           </ul>
         </section>
 
-        <section className="block wrap split" aria-labelledby="dinamica">
+        <section className="block wrap split" aria-labelledby="etapas">
           <div className="split-head">
-            <p className="kicker">Dinámica de calificación</p>
-            <h2 id="dinamica">Cómo se califica</h2>
+            <p className="kicker">Cómo se califica</p>
+            <h2 id="etapas">Etapas</h2>
           </div>
           <ol className="phases">
-            <li>
-              <span className="phase-icon"><CalendarClock aria-hidden="true" /></span>
-              <div>
-                <h3>Fase 1 · Participaciones</h3>
-                <p>Se aceptan videos hasta el 20 de octubre.</p>
-              </div>
-            </li>
-            <li>
-              <span className="phase-icon"><Gavel aria-hidden="true" /></span>
-              <div>
-                <h3>Fase 2 · Jurado</h3>
-                <p>El jurado califica cada video, uno por uno, y anunciará la fecha de resultados.</p>
-              </div>
-            </li>
+            {STAGES.map(({ icon: Icon, title, body }, i) => {
+              const current = i === (closed ? 1 : 0);
+              return (
+                <li key={title} className={current ? "is-current" : undefined} aria-current={current ? "step" : undefined}>
+                  <span className="phase-icon"><Icon aria-hidden="true" /></span>
+                  <div>
+                    <h3>
+                      Etapa {i + 1} · {title}
+                      {current && <span className="phase-badge">En curso</span>}
+                    </h3>
+                    <p>{body}</p>
+                  </div>
+                </li>
+              );
+            })}
           </ol>
         </section>
 
@@ -308,19 +398,23 @@ export default function Landing() {
 
       <section className="closer" aria-labelledby="cierre">
         <div className="wrap closer-inner">
-          <h2 id="cierre">Tu solo, antes del 20 de octubre</h2>
-          <div className="ctas">
+          <div>
+            <h2 id="cierre">{closed ? "Gracias por participar" : "¿Listo para grabar?"}</h2>
+            <p>
+              {closed
+                ? "El jurado anunciará la fecha de resultados."
+                : "Participa hasta el 20 de octubre."}
+            </p>
+          </div>
+          {closed ? (
+            <FollowButton label="Sigue los resultados en @peruguitar" />
+          ) : (
             <a className="btn btn-primary" href={TRACK_URL} download={TRACK_FILENAME}>
               <ArrowDownToLine aria-hidden="true" />
               Descargar la pista
               <span className="btn-meta">{TRACK_META}</span>
             </a>
-            <a className="btn btn-outline" href={INSTAGRAM_URL} target="_blank" rel="noopener">
-              <Instagram aria-hidden="true" />
-              Seguir a @peruguitar
-              <ArrowUpRight aria-hidden="true" className="btn-trail" />
-            </a>
-          </div>
+          )}
         </div>
       </section>
 

@@ -131,6 +131,37 @@ input:focus-visible {
 .btn-brand:hover {
   background: #075a66;
 }
+/* Play button doubles as its own progress bar */
+.btn-listen {
+  color: #fff;
+  background:
+    linear-gradient(90deg, rgba(25, 195, 214, 0.28) var(--progress, 0%), transparent var(--progress, 0%)),
+    rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1.5px var(--brand);
+  backdrop-filter: blur(6px);
+}
+.btn-listen:hover {
+  background-color: rgba(25, 195, 214, 0.12);
+}
+@media (min-width: 480px) {
+  .btn-listen {
+    min-width: 15.5rem;
+  }
+}
+.btn-listen audio {
+  display: none;
+}
+.btn-listen .btn-meta {
+  font-variant-numeric: tabular-nums;
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
 .btn-meta {
   font: 500 0.68rem/1 var(--mono);
   opacity: 0.7;
@@ -164,7 +195,7 @@ input:focus-visible {
 @media (max-width: 719px) {
   .hero {
     background-image:
-      linear-gradient(180deg, rgba(6, 20, 22, 0.55) 0%, rgba(6, 20, 22, 0.82) 40%, rgba(6, 20, 22, 0.95) 75%),
+      linear-gradient(180deg, rgba(6, 20, 22, 0.25) 0%, rgba(6, 20, 22, 0.55) 22%, rgba(6, 20, 22, 0.8) 45%, rgba(6, 20, 22, 0.94) 75%),
       image-set(url("/pg-tournament/hero-sm.webp") type("image/webp"));
     background-position: 72% 0;
     background-size: cover;
@@ -243,15 +274,11 @@ input:focus-visible {
     padding-block: 4rem 10rem;
   }
 }
-.eyebrow,
 .kicker {
   margin: 0;
   font: 600 0.75rem/1.2 var(--mono);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-}
-.eyebrow {
-  color: var(--brand);
 }
 
 h1 {
@@ -627,13 +654,26 @@ h2 {
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  background: var(--brand-deep);
-  color: #fff;
-}
-.phases li:last-child .phase-icon {
-  background: transparent;
   color: var(--accent);
   box-shadow: inset 0 0 0 2px var(--accent);
+}
+.phases li.is-current .phase-icon {
+  background: var(--brand-deep);
+  color: #fff;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+.phases h3 {
+  flex-wrap: wrap;
+  row-gap: 0.4rem;
+}
+.phase-badge {
+  font: 600 0.62rem/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand) 18%, transparent);
+  color: var(--accent);
 }
 .phases li > div {
   padding-top: 0.55rem;
@@ -676,36 +716,24 @@ h2 {
 /* ---------- Closer + footer ---------- */
 .closer {
   background:
-    radial-gradient(70% 120% at 100% 100%, rgba(25, 195, 214, 0.22), transparent 60%),
+    radial-gradient(60% 140% at 100% 50%, rgba(25, 195, 214, 0.16), transparent 70%),
     var(--night);
   color: #fff;
-  position: relative;
-  overflow: hidden;
-}
-.closer::before {
-  /* six strings running across the band */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(rgba(25, 195, 214, 0.2), rgba(25, 195, 214, 0.2)) 0 18% / 100% 1px no-repeat,
-    linear-gradient(rgba(25, 195, 214, 0.2), rgba(25, 195, 214, 0.2)) 0 32% / 100% 1px no-repeat,
-    linear-gradient(rgba(25, 195, 214, 0.2), rgba(25, 195, 214, 0.2)) 0 46% / 100% 1.5px no-repeat,
-    linear-gradient(rgba(25, 195, 214, 0.2), rgba(25, 195, 214, 0.2)) 0 60% / 100% 2px no-repeat,
-    linear-gradient(rgba(25, 195, 214, 0.2), rgba(25, 195, 214, 0.2)) 0 74% / 100% 2.5px no-repeat,
-    linear-gradient(rgba(25, 195, 214, 0.2), rgba(25, 195, 214, 0.2)) 0 88% / 100% 3px no-repeat;
-  pointer-events: none;
 }
 .closer-inner {
-  position: relative;
-  padding-block: 3.5rem;
-  display: grid;
-  gap: 1.5rem;
-  justify-items: start;
+  padding-block: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
 }
 .closer h2 {
-  font-size: clamp(2.8rem, 9vw, 5.5rem);
-  max-width: 14ch;
+  font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+}
+.closer p {
+  margin: 0.35rem 0 0;
+  color: rgba(234, 244, 245, 0.72);
 }
 .footer {
   background: #030b0c;
