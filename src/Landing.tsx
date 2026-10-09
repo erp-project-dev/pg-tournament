@@ -15,10 +15,16 @@ import {
   Music,
   Pause,
   Play,
+  Repeat,
+  RotateCcw,
+  RotateCw,
   Send,
   SlidersVertical,
   Smartphone,
   TrendingUp,
+  Volume1,
+  Volume2,
+  VolumeX,
   Wallet,
 } from "lucide-react";
 
@@ -137,62 +143,242 @@ function formatTime(t: number) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
-function ListenButton() {
+// RMS loudness of the track in 96 slices (0–z), precomputed from the WAV.
+const WAVEFORM = "echfffdjjiigiihijfffiihjihhghjhhllpiogfqmpklnppmnlqrplonjpolpppmorokojosrqxlzyusprsyyusgb8542200";
+const BARS = Array.from(WAVEFORM, (c) => 0.16 + 0.84 * (parseInt(c, 36) / 35) ** 1.6);
+const SEEK_STEP = 5;
+
+function TrackPlayer() {
   const audio = useRef<HTMLAudioElement>(null);
-  const [state, setState] = useState<"idle" | "loading" | "playing" | "paused">("idle");
+  const wave = useRef<HTMLDivElement>(null);
+  const [state, setState] = useState<"loading" | "playing" | "paused">("paused");
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [loop, setLoop] = useState(true);
+  const [volume, setVolume] = useState(0.9);
+  const [muted, setMuted] = useState(false);
+  const [hover, setHover] = useState<number | null>(null);
+  const [scrubbing, setScrubbing] = useState(false);
+  // iOS ignores element volume; only offer mute there.
+  const [canSetVolume, setCanSetVolume] = useState(true);
 
-  const toggle = () => {
+  useEffect(() => {
+    const probe = new Audio();
+    probe.volume = 0.5;
+    setCanSetVolume(probe.volume === 0.5);
+  }, []);
+
+  useEffect(() => {
     const el = audio.current;
     if (!el) return;
-    if (el.paused) {
-      if (state === "idle") setState("loading");
-      void el.play().catch(() => setState("idle"));
-    } else {
-      el.pause();
+    el.volume = volume;
+    el.muted = muted;
+    el.loop = loop;
+  }, [volume, muted, loop]);
+
+  const play = () => {
+    const el = audio.current;
+    if (!el) return;
+    if (el.readyState < 3) setState("loading");
+    void el.play().catch(() => setState("paused"));
+  };
+
+  const toggle = () => {
+    if (audio.current?.paused) play();
+    else audio.current?.pause();
+  };
+
+  const seek = (t: number) => {
+    const el = audio.current;
+    if (!el || !duration) return;
+    el.currentTime = Math.min(Math.max(t, 0), duration - 0.05);
+    setTime(el.currentTime);
+  };
+
+  const ratioAt = (clientX: number) => {
+    const r = wave.current!.getBoundingClientRect();
+    return Math.min(Math.max((clientX - r.left) / r.width, 0), 1);
+  };
+
+  const onWaveKey = (e: React.KeyboardEvent) => {
+    const moves: Record<string, number> = {
+      ArrowRight: time + SEEK_STEP,
+      ArrowUp: time + SEEK_STEP,
+      ArrowLeft: time - SEEK_STEP,
+      ArrowDown: time - SEEK_STEP,
+      Home: 0,
+      End: duration,
+    };
+    if (e.key in moves) {
+      e.preventDefault();
+      seek(moves[e.key]);
+    } else if (e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      toggle();
     }
   };
 
+  const progress = duration ? time / duration : 0;
   const playing = state === "playing";
-  const progress = duration ? (time / duration) * 100 : 0;
+  const level = muted ? 0 : volume;
+  const VolumeIcon = level === 0 ? VolumeX : level < 0.5 ? Volume1 : Volume2;
 
   return (
-    <button
-      type="button"
-      className="btn btn-listen"
-      onClick={toggle}
-      aria-pressed={playing}
-      style={{ "--progress": `${progress}%` } as React.CSSProperties}
+    <div
+      className="player"
+      role="group"
+      aria-label="Reproductor de la pista"
+      data-state={state}
+      style={{ "--progress": progress } as React.CSSProperties}
     >
-      {state === "loading" ? (
-        <LoaderCircle aria-hidden="true" className="spin" />
-      ) : playing ? (
-        <Pause aria-hidden="true" />
-      ) : (
-        <Play aria-hidden="true" />
-      )}
-      {playing ? "Pausar" : state === "paused" ? "Continuar" : "Escuchar la pista"}
-      {state !== "idle" && duration > 0 && (
-        <span className="btn-meta">
-          {formatTime(time)} / {formatTime(Math.round(duration))}
-        </span>
-      )}
+      <button
+        type="button"
+        className="player-play"
+        onClick={toggle}
+        aria-label={playing ? "Pausar" : "Reproducir"}
+      >
+        {state === "loading" ? (
+          <LoaderCircle aria-hidden="true" className="spin" />
+        ) : playing ? (
+          <Pause aria-hidden="true" />
+        ) : (
+          <Play aria-hidden="true" />
+        )}
+      </button>
+
+      <div className="player-main">
+        <p className="player-head">
+          <span className="player-now">
+            <span className="eq" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+            {playing ? "Sonando" : "Pista oficial"}
+          </span>
+          <span>Re menor · Dm</span>
+        </p>
+        <div
+          ref={wave}
+          className="wave"
+          role="slider"
+          tabIndex={0}
+          aria-label="Posición en la pista"
+          aria-valuemin={0}
+          aria-valuemax={Math.round(duration)}
+          aria-valuenow={Math.round(time)}
+          aria-valuetext={`${formatTime(time)} de ${formatTime(duration)}`}
+          onKeyDown={onWaveKey}
+          onPointerDown={(e) => {
+            if (!duration) return;
+            e.currentTarget.setPointerCapture(e.pointerId);
+            setScrubbing(true);
+            seek(ratioAt(e.clientX) * duration);
+          }}
+          onPointerMove={(e) => {
+            const r = ratioAt(e.clientX);
+            if (e.pointerType === "mouse") setHover(r);
+            if (scrubbing) seek(r * duration);
+          }}
+          onPointerUp={() => setScrubbing(false)}
+          onPointerCancel={() => setScrubbing(false)}
+          onPointerLeave={() => setHover(null)}
+        >
+          {BARS.map((h, i) => {
+            const at = (i + 0.5) / BARS.length;
+            return (
+              <span
+                key={i}
+                className={at <= progress ? "on" : undefined}
+                style={{ "--h": h } as React.CSSProperties}
+              />
+            );
+          })}
+          <i className="wave-head" aria-hidden="true" />
+          {hover !== null && duration > 0 && (
+            <i className="wave-hover" style={{ left: `${hover * 100}%` }} aria-hidden="true">
+              <b>{formatTime(hover * duration)}</b>
+            </i>
+          )}
+        </div>
+
+        <div className="player-bar">
+          <span className="player-time">
+            {formatTime(time)} <span>/ {duration ? formatTime(duration) : "--:--"}</span>
+          </span>
+
+          <button
+            type="button"
+            className="player-icon player-skip"
+            onClick={() => seek(time - SEEK_STEP)}
+            aria-label={`Retroceder ${SEEK_STEP} segundos`}
+          >
+            <RotateCcw aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="player-icon player-skip"
+            onClick={() => seek(time + SEEK_STEP)}
+            aria-label={`Adelantar ${SEEK_STEP} segundos`}
+          >
+            <RotateCw aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="player-icon player-loop"
+            onClick={() => setLoop((v) => !v)}
+            aria-pressed={loop}
+            aria-label="Repetir la pista"
+            title={loop ? "Repetir: activado" : "Repetir: desactivado"}
+          >
+            <Repeat aria-hidden="true" />
+          </button>
+
+          <div className="player-volume">
+            <button
+              type="button"
+              className="player-icon"
+              onClick={() => {
+                if (muted || volume === 0) {
+                  setMuted(false);
+                  if (volume === 0) setVolume(0.6);
+                } else setMuted(true);
+              }}
+              aria-label={muted ? "Activar sonido" : "Silenciar"}
+            >
+              <VolumeIcon aria-hidden="true" />
+            </button>
+            {canSetVolume && (
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={level}
+                onChange={(e) => {
+                  setVolume(Number(e.target.value));
+                  setMuted(false);
+                }}
+                aria-label="Volumen"
+                aria-valuetext={`${Math.round(level * 100)}%`}
+                style={{ "--vol": level } as React.CSSProperties}
+              />
+            )}
+          </div>
+        </div>
+      </div>
       <audio
         ref={audio}
         src={TRACK_URL}
-        preload="none"
+        preload="metadata"
         onPlaying={() => setState("playing")}
         onPause={() => setState("paused")}
         onWaiting={() => setState("loading")}
-        onEnded={() => {
-          setState("idle");
-          setTime(0);
-        }}
-        onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+        onEnded={() => setState("paused")}
+        onTimeUpdate={(e) => !scrubbing && setTime(e.currentTarget.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
       />
-    </button>
+    </div>
   );
 }
 
@@ -282,7 +468,9 @@ export default function Landing() {
         <div className="wrap hero-grid">
           <div className="hero-body">
             <h1>
-              <span className="h1-small">II Concurso de</span>
+              <span className="h1-small">
+                <span className="h1-ed">II</span> Concurso de
+              </span>
               <span className="h1-line">Solos de</span>
               <span className="h1-line">Guitarra</span>
             </h1>
@@ -296,12 +484,12 @@ export default function Landing() {
                 <FollowButton label="Sigue los resultados en @peruguitar" />
               ) : (
                 <>
+                  <TrackPlayer />
                   <a className="btn btn-primary" href={TRACK_URL} download={TRACK_FILENAME}>
                     <ArrowDownToLine aria-hidden="true" />
                     Descargar la pista
                     <span className="btn-meta">{TRACK_META}</span>
                   </a>
-                  <ListenButton />
                 </>
               )}
             </div>

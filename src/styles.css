@@ -112,29 +112,289 @@ input:focus-visible {
 .btn-brand:hover {
   background: #075a66;
 }
-/* Play button doubles as its own progress bar */
-.btn-listen {
-  color: #fff;
-  background:
-    linear-gradient(90deg, rgba(25, 195, 214, 0.28) var(--progress, 0%), transparent var(--progress, 0%)),
-    rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 0 0 1.5px var(--brand);
-  backdrop-filter: blur(6px);
+/* ---------- Track player ---------- */
+.player {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.75rem 0.9rem 0.55rem;
+  border-radius: 1rem;
+  background: rgba(6, 20, 22, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(25, 195, 214, 0.35), 0 18px 40px -20px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
 }
-.btn-listen:hover {
-  background-color: rgba(25, 195, 214, 0.12);
+.player-play {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--brand);
+  color: var(--on-brand);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
-@media (min-width: 480px) {
-  .btn-listen {
-    min-width: 15.5rem;
+.player-play:hover {
+  transform: scale(1.06);
+}
+.player[data-state="playing"] .player-play {
+  box-shadow: 0 0 0 6px rgba(25, 195, 214, 0.18), 0 0 28px rgba(25, 195, 214, 0.55);
+}
+.player-play svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  fill: currentColor;
+}
+.player-play .spin {
+  fill: none;
+}
+.player-main {
+  flex: 1;
+  min-width: 0;
+}
+.player-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 0.25rem;
+  font: 600 0.66rem/1 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+.player-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--brand);
+}
+/* Tiny level meter: still when paused, bouncing while the track plays */
+.eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 0.7rem;
+}
+.eq i {
+  width: 3px;
+  height: 40%;
+  border-radius: 1px;
+  background: currentColor;
+}
+.eq i:nth-child(2) {
+  height: 75%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .player[data-state="playing"] .eq i {
+    animation: eq 0.9s ease-in-out infinite alternate;
+  }
+  .player[data-state="playing"] .eq i:nth-child(2) {
+    animation-duration: 0.6s;
+  }
+  .player[data-state="playing"] .eq i:nth-child(3) {
+    animation-duration: 0.75s;
+    animation-delay: -0.3s;
   }
 }
-.btn-listen audio {
-  display: none;
+@keyframes eq {
+  from {
+    height: 20%;
+  }
+  to {
+    height: 100%;
+  }
 }
-.btn-listen .btn-meta {
+
+/* Waveform scrubber */
+.wave {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 2.75rem;
+  cursor: pointer;
+  touch-action: none;
+  border-radius: 0.3rem;
+}
+.wave > span {
+  flex: 1;
+  height: calc(var(--h) * 100%);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.22);
+  transform-origin: center;
+  transition: background-color 0.2s ease;
+}
+.wave > span.on {
+  background: var(--brand);
+}
+.wave:hover > span:not(.on) {
+  background: rgba(255, 255, 255, 0.32);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .player[data-state="playing"] .wave > span.on:has(+ span:not(.on)) {
+    animation: pulse 0.5s ease-in-out infinite alternate;
+    background: #fff;
+  }
+}
+@keyframes pulse {
+  to {
+    transform: scaleY(1.25);
+  }
+}
+.wave-head {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: calc(var(--progress) * 100%);
+  width: 2px;
+  margin-left: -1px;
+  background: #fff;
+  border-radius: 1px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+.wave-hover {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+.wave-hover b {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  translate: -50% -4px;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.3rem;
+  background: #fff;
+  color: var(--night);
+  font: 600 0.65rem/1 var(--mono);
+  white-space: nowrap;
+}
+.wave:focus-visible {
+  outline-offset: 4px;
+}
+
+/* Transport row */
+.player-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-top: 0.35rem;
+}
+.player-time {
+  font: 500 0.72rem/1 var(--mono);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  margin-right: auto;
 }
+.player-time span {
+  opacity: 0.55;
+}
+.player-icon {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.player-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.player-icon svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+.player-loop {
+  position: relative;
+}
+.player-loop[aria-pressed="true"] {
+  color: var(--brand);
+}
+.player-loop[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  bottom: 0.2rem;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.player-volume {
+  display: flex;
+  align-items: center;
+  margin-left: 0.3rem;
+}
+.player-volume input {
+  --fill: var(--brand);
+  width: 5.5rem;
+  height: 1.5rem;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+.player-volume input::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--fill) calc(var(--vol) * 100%), rgba(255, 255, 255, 0.2) 0);
+}
+.player-volume input::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--fill) calc(var(--vol) * 100%), rgba(255, 255, 255, 0.2) 0);
+}
+.player-volume input::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(25, 195, 214, 0.35);
+}
+.player-volume input::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(25, 195, 214, 0.35);
+}
+@media (max-width: 420px) {
+  .player {
+    gap: 0.7rem;
+    padding-inline: 0.75rem;
+  }
+  .player-play {
+    width: 2.9rem;
+    height: 2.9rem;
+  }
+  .player-volume input {
+    width: 3.5rem;
+  }
+}
+/* Very narrow: scrubbing the wave covers skipping */
+@media (max-width: 374px) {
+  .player-skip {
+    display: none;
+  }
+}
+
 .spin {
   animation: spin 0.9s linear infinite;
 }
@@ -157,7 +417,15 @@ input:focus-visible {
 .ctas {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.75rem;
+}
+.hero .ctas {
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 34rem;
+  gap: 1rem;
 }
 
 /* ---------- Hero ---------- */
@@ -167,7 +435,7 @@ input:focus-visible {
   overflow: hidden;
   background-color: var(--night);
   background-image:
-    linear-gradient(90deg, rgba(6, 20, 22, 0.95) 0%, rgba(6, 20, 22, 0.86) 45%, rgba(6, 20, 22, 0.45) 75%, rgba(6, 20, 22, 0.3) 100%),
+    radial-gradient(ellipse 60% 75% at 50% 55%, rgba(6, 20, 22, 0.88) 0%, rgba(6, 20, 22, 0.7) 55%, rgba(6, 20, 22, 0.45) 100%),
     linear-gradient(0deg, rgba(6, 20, 22, 0.85) 0%, transparent 35%),
     image-set(url("/pg-tournament/hero.webp") type("image/webp"));
   background-size: cover;
@@ -245,14 +513,16 @@ input:focus-visible {
 }
 
 .hero-body {
-  padding-block: 2.5rem 7rem;
+  padding-block: 3.5rem 7rem;
   display: grid;
-  gap: 1.4rem;
-  justify-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  justify-items: center;
+  text-align: center;
 }
 @media (min-width: 720px) {
   .hero-body {
-    padding-block: 4rem 10rem;
+    padding-block: 4.5rem 9rem;
   }
 }
 .kicker {
@@ -273,15 +543,24 @@ h1 {
   letter-spacing: -0.01em;
 }
 .h1-small {
-  font-size: clamp(1.6rem, 6vw, 3rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+  font-size: clamp(1.35rem, 5.4vw, 2.3rem);
   font-weight: 700;
   font-variation-settings: "wdth" 100;
-  letter-spacing: 0.02em;
-  margin-bottom: 0.25em;
-  opacity: 0.92;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35em;
+}
+/* Edition numeral picks up the stage light */
+.h1-ed {
+  color: var(--brand);
+  font-weight: 900;
+  text-shadow: 0 0 18px rgba(25, 195, 214, 0.55);
 }
 .h1-line {
-  font-size: clamp(4.6rem, 22vw, 12.5rem);
+  font-size: clamp(4.6rem, 21vw, 9.5rem);
 }
 .h1-line:last-child {
   /* outlined second line, lit like the stage */
@@ -296,7 +575,7 @@ h1 {
 }
 
 .lede {
-  margin: 0;
+  margin: -0.4rem auto 0;
   max-width: 34rem;
   font-size: clamp(1.15rem, 2.4vw, 1.4rem);
   line-height: 1.45;
@@ -308,9 +587,9 @@ h1 {
 .countdown {
   display: inline-flex;
   align-items: center;
-  gap: 0.9rem;
-  padding: 0.7rem 0.8rem 0.7rem 0.9rem;
-  border-radius: 0.9rem;
+  gap: 1.2rem;
+  padding: 0.9rem 1rem 0.9rem 1.1rem;
+  border-radius: 1.1rem;
   background: rgba(255, 255, 255, 0.06);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(6px);
@@ -330,13 +609,13 @@ h1 {
   text-align: center;
 }
 .countdown-label small {
-  font: 600 0.68rem/1 var(--mono);
+  font: 600 0.78rem/1 var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   opacity: 0.8;
 }
 .countdown-label b {
-  font: 900 2.1rem/0.9 var(--display);
+  font: 900 clamp(2.3rem, 9vw, 3.4rem)/0.9 var(--display);
   font-variation-settings: "wdth" 70;
   text-transform: uppercase;
   color: var(--brand);
@@ -349,11 +628,11 @@ h1 {
 .countdown-cells > span {
   display: grid;
   justify-items: center;
-  min-width: 3.4rem;
-  padding: 0.35rem 0.4rem 0.4rem;
-  border-radius: 0.5rem;
+  min-width: clamp(3.1rem, 13vw, 4.6rem);
+  padding: 0.5rem 0.4rem 0.55rem;
+  border-radius: 0.65rem;
   background: rgba(25, 195, 214, 0.16);
-  font: 500 0.65rem/1 var(--mono);
+  font: 500 clamp(0.6rem, 2.4vw, 0.72rem)/1 var(--mono);
   text-transform: uppercase;
 }
 @media (max-width: 400px) {
@@ -362,20 +641,23 @@ h1 {
     padding-inline: 0.6rem;
   }
   .countdown-label {
-    padding-right: 0.7rem;
+    padding-right: 0.6rem;
   }
   .countdown-label b {
-    font-size: 1.7rem;
+    font-size: 2rem;
   }
   .countdown-cells {
     gap: 0.3rem;
   }
   .countdown-cells > span {
-    min-width: 2.75rem;
+    min-width: 2.6rem;
+  }
+  .countdown-cells b {
+    font-size: 1.75rem;
   }
 }
 .countdown-cells b {
-  font: 900 1.9rem/1 var(--display);
+  font: 900 clamp(1.9rem, 8vw, 3rem)/1 var(--display);
   font-variation-settings: "wdth" 70;
   font-variant-numeric: tabular-nums;
   margin-bottom: 0.2rem;
@@ -697,17 +979,17 @@ h2 {
 /* ---------- Closer + footer ---------- */
 .closer {
   background:
-    radial-gradient(60% 140% at 100% 50%, rgba(25, 195, 214, 0.16), transparent 70%),
+    radial-gradient(50% 120% at 50% 100%, rgba(25, 195, 214, 0.18), transparent 70%),
     var(--night);
   color: #fff;
 }
 .closer-inner {
-  padding-block: 2rem;
+  padding-block: 3rem;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem 2rem;
+  gap: 1.5rem;
+  text-align: center;
 }
 .closer h2 {
   font-size: clamp(1.9rem, 4.5vw, 2.6rem);
