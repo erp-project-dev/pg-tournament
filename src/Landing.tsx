@@ -88,6 +88,23 @@ const STAGES = [
   { icon: Gavel, title: "Jurado", body: "El jurado califica cada video, uno por uno, y anunciará la fecha de resultados." },
 ];
 
+const PARTICIPANTS = [
+  { user: "eduardo_jbp", name: "Eduardo JBP", reel: "https://www.instagram.com/reel/DeC1BrGgYcE/" },
+  { user: "sebsmusic31", name: "Sebastían Pareja", reel: "https://www.instagram.com/p/DeNNaV-uYPz/" },
+  { user: "abel.vega", name: "Abel Vega", reel: "https://www.instagram.com/p/DeS_lvqOHvw/" },
+  { user: "rodd_fx", name: "Rodrigo Minchán", reel: "https://www.instagram.com/p/DeVedY0BSNk/" },
+  { user: "carlosdiegocs", name: "Carlos Cerrón", reel: "https://www.instagram.com/p/Dec6As3MKHj/" },
+  { user: "carloscazmusic", name: "Carlos Cazorla", reel: "https://www.instagram.com/p/DehgH1mpnUn/" },
+  { user: "alfredo64970", name: "Alfredo Choqque", reel: "https://www.instagram.com/p/DegJTmYIJyF/" },
+  { user: "manueltorresmusic", name: "Manuel Torres", reel: "https://www.instagram.com/reels/Dep-jzhJuNp/" },
+  { user: "brandonmurga73", name: "Brandon Murga", reel: "https://www.instagram.com/p/DeqYf96iOrw/" },
+  { user: "alonso_villafan", name: "Alonso Villafan", reel: "https://www.instagram.com/p/Deqe3WPOw4b/" },
+  { user: "sebastianblancoguitar", name: "Sebastian Blanco", reel: "https://www.instagram.com/p/DesD4J3N4fP/" },
+  { user: "jaibra_official", name: "Jairo Brayan", reel: "https://www.instagram.com/p/DeuKlbpNgAY/" },
+  { user: "luismelendezguitarist", name: "Luis Melendez", reel: "https://www.instagram.com/p/DeueaHtpxXS/" },
+  { user: "gian_mzzz", name: "Gian Maza", reel: "https://www.instagram.com/p/Deuhh6HO0A6/" },
+];
+
 const TERMS = [
   { icon: CalendarX2, term: "Fecha límite", body: "20 de octubre, hasta las 23:59 (hora de Lima)." },
   { icon: MapPin, term: "Quién participa", body: "Residentes en Perú o personas con cuenta activa de Yape o Plin." },
@@ -565,6 +582,42 @@ export default function Landing() {
               );
             })}
           </ol>
+        </section>
+
+        <section className="block wrap" aria-labelledby="participantes">
+          <p className="kicker">{PARTICIPANTS.length} guitarristas, {PARTICIPANTS.length} solos</p>
+          <h2 id="participantes">Participantes</h2>
+          <p className="muted">Gracias a cada uno por grabar, publicar y poner su sonido en juego. Dale play y apóyalos.</p>
+          <ul className="entrants">
+            {PARTICIPANTS.map(({ user, name, reel }, i) => (
+              <li key={user}>
+                <span className="entrant-num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <span className="entrant-avatar" aria-hidden="true">
+                  {name.split(" ").slice(0, 2).map((w) => w[0]).join("")}
+                  <img
+                    src={`${BASE}participants/${user}.webp`}
+                    alt=""
+                    width="100"
+                    height="100"
+                    loading="lazy"
+                    onError={(e) => e.currentTarget.remove()}
+                  />
+                </span>
+                <h3>
+                  <span className="sr-only">Participante {i + 1}: </span>
+                  {name}
+                </h3>
+                <a className="entrant-user" href={`https://www.instagram.com/${user}/`} target="_blank" rel="noopener">
+                  @{user}
+                </a>
+                <a className="entrant-reel" href={reel} target="_blank" rel="noopener">
+                  <Play aria-hidden="true" />
+                  Ver su solo
+                  <ArrowUpRight aria-hidden="true" />
+                </a>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section className="block wrap" aria-labelledby="terminos">
