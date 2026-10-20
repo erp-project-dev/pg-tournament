@@ -1020,6 +1020,7 @@ h2 {
   font: 400 0.8rem/1.4 var(--mono);
   text-decoration: none;
   overflow-wrap: anywhere;
+  margin-bottom: 1.2rem;
 }
 .entrant-user:hover {
   color: var(--accent);
@@ -1029,7 +1030,7 @@ h2 {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  margin-top: 1.2rem;
+  margin-top: auto;
   padding: 0.65rem 1rem;
   border: 1px solid var(--line);
   border-radius: 999px;
