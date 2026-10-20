@@ -1150,3 +1150,122 @@ h2 {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* ---------- Navegación por secciones ---------- */
+.jump {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.jump-inner {
+  position: relative;
+  display: flex;
+  justify-content: safe center;
+  gap: 0.4rem;
+  padding-block: 0.6rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.jump-inner::-webkit-scrollbar {
+  display: none;
+}
+.jump a {
+  flex: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  color: var(--muted);
+  font: 600 0.75rem/1 var(--mono);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.jump a:hover,
+.jump a:focus-visible {
+  background: var(--sheet);
+  color: var(--ink);
+}
+.jump a.is-active {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+@media (max-width: 559px) {
+  .jump-inner {
+    gap: 0.15rem;
+    padding-block: 0.45rem;
+  }
+  .jump a {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.7rem;
+  }
+}
+h2[id],
+.entrants li {
+  scroll-margin-top: 4.5rem;
+}
+
+/* Tarjeta abierta desde un link compartido */
+.entrants li:target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .entrants li:target {
+    animation: entrant-glow 1.6s ease 2;
+  }
+}
+@keyframes entrant-glow {
+  50% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+}
+
+/* ---------- Volver arriba ---------- */
+.to-top {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sheet) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.75rem);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s, border-color 0.2s ease, color 0.2s ease;
+}
+.to-top.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.to-top:hover,
+.to-top:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.to-top svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .jump a {
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .to-top {
+    transform: none;
+  }
+}

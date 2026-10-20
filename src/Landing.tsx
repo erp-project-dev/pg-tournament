@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowDownToLine,
+  ArrowUp,
   ArrowUpRight,
   AudioWaveform,
   CalendarClock,
   CalendarX2,
   Check,
   Copy,
+  Users,
   Crosshair,
   Gavel,
   Instagram,
@@ -463,9 +465,139 @@ function FollowButton({ label }: { label: string }) {
   );
 }
 
+// Sección visible en el centro de la pantalla, para resaltarla en el menú
+function useActiveSection(ids: string[]) {
+  const [active, setActive] = useState<string | null>(null);
+  const key = ids.join();
+  useEffect(() => {
+    const seen = new Map<Element, string>();
+    for (const id of ids) {
+      const section = document.getElementById(id)?.closest("section");
+      if (section) seen.set(section, id);
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.isIntersecting) setActive(seen.get(e.target) ?? null);
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+    seen.forEach((_, el) => io.observe(el));
+    return () => io.disconnect();
+  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
+  return active;
+}
+
+function SectionNav({ items }: { items: { id: string; label: string }[] }) {
+  const bar = useRef<HTMLDivElement>(null);
+  const active = useActiveSection(items.map((i) => i.id));
+
+  // En móvil la barra se desliza sola para que el link activo siempre se vea
+  useEffect(() => {
+    const el = bar.current;
+    const link = el?.querySelector<HTMLElement>(".is-active");
+    if (!el || !link) return;
+    el.scrollTo({ left: link.offsetLeft - (el.clientWidth - link.offsetWidth) / 2, behavior: "smooth" });
+  }, [active]);
+
+  return (
+    <nav className="jump" aria-label="Secciones">
+      <div ref={bar} className="wrap jump-inner">
+        {items.map(({ id, label }) => (
+          <a
+            key={id}
+            href={`#${id}`}
+            className={id === active ? "is-active" : undefined}
+            aria-current={id === active ? "location" : undefined}
+          >
+            {label}
+          </a>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+function BackToTop() {
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShown(window.scrollY > 900);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <button
+      type="button"
+      className={shown ? "to-top is-shown" : "to-top"}
+      onClick={() => window.scrollTo({ top: 0 })}
+      aria-label="Volver arriba"
+      tabIndex={shown ? 0 : -1}
+    >
+      <ArrowUp aria-hidden="true" />
+    </button>
+  );
+}
+
+// El contenido se monta con React, así que el navegador no alcanza a saltar al #ancla solo
+function useHashScroll() {
+  useEffect(() => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (id) document.getElementById(id)?.scrollIntoView();
+  }, []);
+}
+
 export default function Landing() {
   const countdown = useCountdown();
   const { closed } = countdown;
+  useHashScroll();
+
+  // Mismo orden que las secciones de <main>
+  const people = { id: "participantes", label: "Participantes" };
+  const nav = [
+    ...(closed ? [people] : [{ id: "pasos", label: "Participar" }]),
+    { id: "criterios", label: "Criterios" },
+    { id: "etapas", label: "Etapas" },
+    ...(closed ? [] : [people]),
+    { id: "terminos", label: "Términos" },
+  ];
+
+  const participants = (
+    <section className="block wrap" aria-labelledby="participantes">
+      <p className="kicker">{PARTICIPANTS.length} guitarristas, {PARTICIPANTS.length} solos</p>
+      <h2 id="participantes">Participantes</h2>
+      <p className="muted">Gracias a cada uno por grabar y publicar su solo. Revisa cada participación dando clic en el participante.</p>
+      <ul className="entrants">
+        {PARTICIPANTS.map(({ user, name, reel }, i) => (
+          <li key={user} id={`p-${user}`}>
+            <span className="entrant-num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            <span className="entrant-avatar" aria-hidden="true">
+              {name.split(" ").slice(0, 2).map((w) => w[0]).join("")}
+              <img
+                src={`${BASE}participants/${user}.webp`}
+                alt=""
+                width="100"
+                height="100"
+                loading="lazy"
+                onError={(e) => e.currentTarget.remove()}
+              />
+            </span>
+            <h3>
+              <span className="sr-only">Participante {i + 1}: </span>
+              {name}
+            </h3>
+            <a className="entrant-user" href={`https://www.instagram.com/${user}/`} target="_blank" rel="noopener">
+              @{user}
+            </a>
+            <a className="entrant-reel" href={reel} target="_blank" rel="noopener">
+              <Play aria-hidden="true" />
+              Ver su solo
+              <ArrowUpRight aria-hidden="true" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 
   return (
     <>
@@ -498,7 +630,13 @@ export default function Landing() {
             <Countdown {...countdown} />
             <div className="ctas">
               {closed ? (
-                <FollowButton label="Sigue los resultados en @peruguitar" />
+                <>
+                  <a className="btn btn-primary" href="#participantes">
+                    <Users aria-hidden="true" />
+                    Ver participantes
+                  </a>
+                  <FollowButton label="Sigue los resultados en @peruguitar" />
+                </>
               ) : (
                 <>
                   <TrackPlayer />
@@ -514,37 +652,45 @@ export default function Landing() {
         </div>
       </header>
 
-      <main>
-        <section className="block wrap split" id="participar" aria-labelledby="pasos">
-          <div className="split-head">
-            <p className="kicker">Cómo participar</p>
-            <h2 id="pasos">Cuatro pasos</h2>
-            <p className="muted">De la descarga a la publicación, en este orden.</p>
-          </div>
-          <ol className="steps">
-            {STEPS.map(({ icon: Icon, title, body }, i) => (
-              <li key={title}>
-                <span className="step-num">{String(i + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3>
-                    <Icon aria-hidden="true" />
-                    {title}
-                  </h3>
-                  <p>{body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
+      <SectionNav items={nav} />
 
-        <section className="block wrap split" aria-labelledby="texto">
-          <div className="split-head">
-            <p className="kicker">Para tu publicación</p>
-            <h2 id="texto">Copia este texto</h2>
-            <p className="muted">Pégalo como descripción de tu Reel, con el hashtag incluido.</p>
-          </div>
-          <CaptionBuilder />
-        </section>
+      <main>
+        {closed && participants}
+
+        {!closed && (
+          <>
+            <section className="block wrap split" id="participar" aria-labelledby="pasos">
+              <div className="split-head">
+                <p className="kicker">Cómo participar</p>
+                <h2 id="pasos">Cuatro pasos</h2>
+                <p className="muted">De la descarga a la publicación, en este orden.</p>
+              </div>
+              <ol className="steps">
+                {STEPS.map(({ icon: Icon, title, body }, i) => (
+                  <li key={title}>
+                    <span className="step-num">{String(i + 1).padStart(2, "0")}</span>
+                    <div>
+                      <h3>
+                        <Icon aria-hidden="true" />
+                        {title}
+                      </h3>
+                      <p>{body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            <section className="block wrap split" aria-labelledby="texto">
+              <div className="split-head">
+                <p className="kicker">Para tu publicación</p>
+                <h2 id="texto">Copia este texto</h2>
+                <p className="muted">Pégalo como descripción de tu Reel, con el hashtag incluido.</p>
+              </div>
+              <CaptionBuilder />
+            </section>
+          </>
+        )}
 
         <section className="block wrap" aria-labelledby="criterios">
           <p className="kicker">Qué evalúa el jurado</p>
@@ -584,41 +730,7 @@ export default function Landing() {
           </ol>
         </section>
 
-        <section className="block wrap" aria-labelledby="participantes">
-          <p className="kicker">{PARTICIPANTS.length} guitarristas, {PARTICIPANTS.length} solos</p>
-          <h2 id="participantes">Participantes</h2>
-          <p className="muted">Gracias a cada uno por grabar y publicar su solo. Revisa cada participación dando clic en el participante.</p>
-          <ul className="entrants">
-            {PARTICIPANTS.map(({ user, name, reel }, i) => (
-              <li key={user}>
-                <span className="entrant-num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
-                <span className="entrant-avatar" aria-hidden="true">
-                  {name.split(" ").slice(0, 2).map((w) => w[0]).join("")}
-                  <img
-                    src={`${BASE}participants/${user}.webp`}
-                    alt=""
-                    width="100"
-                    height="100"
-                    loading="lazy"
-                    onError={(e) => e.currentTarget.remove()}
-                  />
-                </span>
-                <h3>
-                  <span className="sr-only">Participante {i + 1}: </span>
-                  {name}
-                </h3>
-                <a className="entrant-user" href={`https://www.instagram.com/${user}/`} target="_blank" rel="noopener">
-                  @{user}
-                </a>
-                <a className="entrant-reel" href={reel} target="_blank" rel="noopener">
-                  <Play aria-hidden="true" />
-                  Ver su solo
-                  <ArrowUpRight aria-hidden="true" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
+        {!closed && participants}
 
         <section className="block wrap" aria-labelledby="terminos">
           <p className="kicker">Letra chica</p>
@@ -671,6 +783,8 @@ export default function Landing() {
           <p>La primera comunidad de guitarristas del Perú, fundada en 2003.</p>
         </div>
       </footer>
+
+      <BackToTop />
     </>
   );
 }
