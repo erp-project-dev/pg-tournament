@@ -587,7 +587,7 @@ export default function Landing() {
         <section className="block wrap" aria-labelledby="participantes">
           <p className="kicker">{PARTICIPANTS.length} guitarristas, {PARTICIPANTS.length} solos</p>
           <h2 id="participantes">Participantes</h2>
-          <p className="muted">Gracias a cada uno por grabar, publicar y poner su sonido en juego. Dale play y apóyalos.</p>
+          <p className="muted">Gracias a cada uno por grabar y publicar su solo. Revisa cada participación dando clic en el participante.</p>
           <ul className="entrants">
             {PARTICIPANTS.map(({ user, name, reel }, i) => (
               <li key={user}>
