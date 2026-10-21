@@ -109,6 +109,7 @@ const PARTICIPANTS = [
   { user: "reivak_srks", name: "Javier", reel: "https://www.instagram.com/p/DesmurTJiL3/" },
   { user: "octvar2210", name: "Octavio Varillas", reel: "https://www.instagram.com/p/DevFjTcBbhk/" },
   { user: "josephessenwanger", name: "Joseph", reel: "https://www.instagram.com/p/DevC7H2JKoJ/" },
+  { user: "joseaguilarortega", name: "José Aguilar", reel: "https://www.instagram.com/p/DevOfUlIien/" },
 ];
 
 const TERMS = [
