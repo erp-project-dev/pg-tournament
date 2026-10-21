@@ -111,6 +111,7 @@ const PARTICIPANTS = [
   { user: "josephessenwanger", name: "Joseph", reel: "https://www.instagram.com/p/DevC7H2JKoJ/" },
   { user: "joseaguilarortega", name: "José Aguilar", reel: "https://www.instagram.com/p/DevOfUlIien/" },
   { user: "alexxnod", name: "Alex Xnod", reel: "https://www.instagram.com/p/DevE8YtRdNu/" },
+  { user: "ticlla866", name: "Jhaseph", reel: "https://www.instagram.com/p/DevVaMeNmhI/" },
 ];
 
 const TERMS = [
