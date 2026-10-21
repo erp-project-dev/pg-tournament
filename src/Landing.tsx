@@ -118,6 +118,7 @@ const PARTICIPANTS = [
   { user: "giovanniamar", name: "Giovanni Amar", reel: "https://www.instagram.com/p/Devhy_8AsOE/" },
   { user: "brunobarckss", name: "Bruno Barcks", reel: "https://www.instagram.com/p/DevmUvgqXZc/" },
   { user: "aleexandeerrrr", name: "Alexander", reel: "https://www.instagram.com/reels/Devl_sIR1Uy/" },
+  { user: "marcello_portal", name: "Marcello", reel: "https://www.instagram.com/reels/DevpQqRTYmD/" },
 ];
 
 const TERMS = [
