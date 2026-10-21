@@ -1269,3 +1269,17 @@ h2[id],
     transform: none;
   }
 }
+.countdown-wrap {
+  display: inline-grid;
+  margin-top: 0.8rem;
+  gap: 1.1rem;
+}
+.countdown-title {
+  margin: 0;
+  font: 900 clamp(2.2rem, 8vw, 3.2rem)/1 var(--display);
+  font-variation-settings: "wdth" 70;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #ffd23f;
+  text-shadow: 0 0 18px rgba(255, 210, 63, 0.35);
+}

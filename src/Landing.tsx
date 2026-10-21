@@ -32,7 +32,7 @@ import {
 
 const INSTAGRAM_URL = "https://www.instagram.com/peruguitar/";
 // End of Oct 20 in Lima (UTC-5).
-const DEADLINE = new Date("2026-10-21T04:59:59Z").getTime();
+const DEADLINE = new Date("2026-10-26T04:59:59Z").getTime();
 const HASHTAG = "#PeruGuitarConcurso2";
 const BASE = import.meta.env.BASE_URL;
 const TRACK_URL = `${BASE}audio/backing-track-dm.wav`;
@@ -86,7 +86,7 @@ const CRITERIA = [
 ];
 
 const STAGES = [
-  { icon: CalendarClock, title: "Participaciones", body: "Se aceptan videos hasta el 20 de octubre." },
+  { icon: CalendarClock, title: "Participaciones", body: "Fecha extendida: se aceptan videos hasta el domingo 25 de octubre." },
   { icon: Gavel, title: "Jurado", body: "El jurado califica cada video, uno por uno, y anunciará la fecha de resultados." },
 ];
 
@@ -122,7 +122,7 @@ const PARTICIPANTS = [
 ];
 
 const TERMS = [
-  { icon: CalendarX2, term: "Fecha límite", body: "20 de octubre, hasta las 23:59 (hora de Lima)." },
+  { icon: CalendarX2, term: "Fecha límite", body: "Extendida al domingo 25 de octubre, hasta las 23:59 (hora de Lima). Cierre final, sin más prórrogas." },
   { icon: MapPin, term: "Quién participa", body: "Residentes en Perú o personas con cuenta activa de Yape o Plin." },
   { icon: Wallet, term: "Premios", body: "Se pagan en soles (PEN) vía Yape o Plin." },
 ];
@@ -156,17 +156,20 @@ function Countdown({ closed, days, hours, minutes, seconds }: CountdownState) {
   }
   const pad = (n: number) => String(n).padStart(2, "0");
   return (
-    <div className="countdown" role="timer" aria-label={`Faltan ${days} días, ${hours} horas y ${minutes} minutos`}>
-      <span className="countdown-label">
-        <small>Cierra el</small>
-        <b>20 oct</b>
-      </span>
-      <span className="countdown-cells" aria-hidden="true">
-        <span><b>{pad(days)}</b>días</span>
-        <span><b>{pad(hours)}</b>horas</span>
-        <span><b>{pad(minutes)}</b>min</span>
-        <span><b>{pad(seconds)}</b>seg</span>
-      </span>
+    <div className="countdown-wrap">
+      <p className="countdown-title">¡Fecha extendida!</p>
+      <div className="countdown" role="timer" aria-label={`Faltan ${days} días, ${hours} horas y ${minutes} minutos`}>
+        <span className="countdown-label">
+          <small>Cierre final</small>
+          <b>dom 25 oct</b>
+        </span>
+        <span className="countdown-cells" aria-hidden="true">
+          <span><b>{pad(days)}</b>días</span>
+          <span><b>{pad(hours)}</b>horas</span>
+          <span><b>{pad(minutes)}</b>min</span>
+          <span><b>{pad(seconds)}</b>seg</span>
+        </span>
+      </div>
     </div>
   );
 }
@@ -770,7 +773,7 @@ export default function Landing() {
             <p>
               {closed
                 ? "El jurado anunciará la fecha de resultados."
-                : "Participa hasta el 20 de octubre."}
+                : "¡Fecha extendida! Participa hasta el domingo 25 de octubre."}
             </p>
           </div>
           {closed ? (
