@@ -107,6 +107,8 @@ const PARTICIPANTS = [
   { user: "gian_mzzz", name: "Gian Maza", reel: "https://www.instagram.com/p/Deuhh6HO0A6/" },
   { user: "santiagozumaran", name: "Santiago Zumarán", reel: "https://www.instagram.com/p/Deup0TgIL7l/" },
   { user: "reivak_srks", name: "Javier", reel: "https://www.instagram.com/p/DesmurTJiL3/" },
+  { user: "octvar2210", name: "Octavio Varillas", reel: "https://www.instagram.com/p/DevFjTcBbhk/" },
+  { user: "josephessenwanger", name: "Joseph", reel: "https://www.instagram.com/p/DevC7H2JKoJ/" },
 ];
 
 const TERMS = [
