@@ -112,6 +112,12 @@ const PARTICIPANTS = [
   { user: "joseaguilarortega", name: "José Aguilar", reel: "https://www.instagram.com/p/DevOfUlIien/" },
   { user: "alexxnod", name: "Alex Xnod", reel: "https://www.instagram.com/p/DevE8YtRdNu/" },
   { user: "ticlla866", name: "Jhaseph", reel: "https://www.instagram.com/p/DevVaMeNmhI/" },
+  { user: "samoguitar", name: "Samuel Ramos", reel: "https://www.instagram.com/p/DevcwzpNA6N/" },
+  { user: "valentinocaprice", name: "Valentino", reel: "https://www.instagram.com/p/DevcZ0LRX78/" },
+  { user: "dave.ssilva", name: "Dave", reel: "https://www.instagram.com/reel/DevgKhIxOou/" },
+  { user: "giovanniamar", name: "Giovanni Amar", reel: "https://www.instagram.com/p/Devhy_8AsOE/" },
+  { user: "brunobarckss", name: "Bruno Barcks", reel: "https://www.instagram.com/p/DevmUvgqXZc/" },
+  { user: "aleexandeerrrr", name: "Alexander", reel: "https://www.instagram.com/reels/Devl_sIR1Uy/" },
 ];
 
 const TERMS = [
