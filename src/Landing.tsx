@@ -121,6 +121,7 @@ const PARTICIPANTS = [
   { user: "marcello_portal", name: "Marcello", reel: "https://www.instagram.com/reels/DevpQqRTYmD/" },
   { user: "reyaldenro82", name: "Reinaldo Rojas", reel: "https://www.instagram.com/reel/Dex4wmMxkyS/" },
   { user: "bryanaznaran", name: "Bryan Aznaran", reel: "https://www.instagram.com/p/De04lagNM5L/" },
+  { user: "hectornizamaa", name: "Hector", reel: "https://www.instagram.com/p/De3O3YItZBr/" },
 ];
 
 const TERMS = [
