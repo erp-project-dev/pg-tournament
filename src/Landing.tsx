@@ -123,6 +123,7 @@ const PARTICIPANTS = [
   { user: "bryanaznaran", name: "Bryan Aznaran", reel: "https://www.instagram.com/p/De04lagNM5L/" },
   { user: "hectornizamaa", name: "Hector", reel: "https://www.instagram.com/p/De3O3YItZBr/" },
   { user: "jhon.andrsn", name: "Jhon", reel: "https://www.instagram.com/p/De5qsh2Oqis/" },
+  { user: "danny_guevara_vela", name: "Danny Guevara", reel: "https://www.instagram.com/p/De6GY2nO2ya/" },
 ];
 
 const TERMS = [
