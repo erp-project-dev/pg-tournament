@@ -13,6 +13,7 @@ import {
   Gavel,
   Instagram,
   LoaderCircle,
+  MessageCircle,
   MapPin,
   Music,
   Pause,
@@ -31,6 +32,7 @@ import {
 } from "lucide-react";
 
 const INSTAGRAM_URL = "https://www.instagram.com/peruguitar/";
+const WHATSAPP_URL = "https://chat.whatsapp.com/DfTBrkCd8UMCYiGDRl0E9X?mode=gi_t";
 // End of Oct 20 in Lima (UTC-5).
 const DEADLINE = new Date("2026-10-26T04:59:59Z").getTime();
 const HASHTAG = "#PeruGuitarConcurso2";
@@ -87,7 +89,7 @@ const CRITERIA = [
 
 const STAGES = [
   { icon: CalendarClock, title: "Participaciones", body: "Fecha extendida: se aceptan videos hasta el domingo 25 de octubre." },
-  { icon: Gavel, title: "Jurado", body: "El jurado califica cada video, uno por uno, y anunciará la fecha de resultados." },
+  { icon: Gavel, title: "Jurado", body: "El jurado califica cada video, uno por uno. Próximamente estaremos avisando los resultados." },
 ];
 
 const PARTICIPANTS = [
@@ -162,7 +164,7 @@ function Countdown({ closed, days, hours, minutes, seconds }: CountdownState) {
     return (
       <div className="countdown is-closed">
         <Gavel aria-hidden="true" />
-        Participaciones cerradas. El jurado está calificando.
+        Ya estamos calificando. Próximamente estaremos avisando los resultados.
       </div>
     );
   }
@@ -484,6 +486,16 @@ function CaptionBuilder() {
   );
 }
 
+function WhatsAppButton() {
+  return (
+    <a className="btn btn-primary" href={WHATSAPP_URL} target="_blank" rel="noopener">
+      <MessageCircle aria-hidden="true" />
+      Únete al grupo de WhatsApp
+      <ArrowUpRight aria-hidden="true" className="btn-trail" />
+    </a>
+  );
+}
+
 function FollowButton({ label }: { label: string }) {
   return (
     <a className="btn btn-outline" href={INSTAGRAM_URL} target="_blank" rel="noopener">
@@ -660,11 +672,11 @@ export default function Landing() {
             <div className="ctas">
               {closed ? (
                 <>
-                  <a className="btn btn-primary" href="#participantes">
+                  <WhatsAppButton />
+                  <a className="btn btn-outline" href="#participantes">
                     <Users aria-hidden="true" />
                     Ver participantes
                   </a>
-                  <FollowButton label="Sigue los resultados en @peruguitar" />
                 </>
               ) : (
                 <>
@@ -781,15 +793,18 @@ export default function Landing() {
       <section className="closer" aria-labelledby="cierre">
         <div className="wrap closer-inner">
           <div>
-            <h2 id="cierre">{closed ? "Gracias por participar" : "¿Listo para grabar?"}</h2>
+            <h2 id="cierre">{closed ? "Ya estamos calificando" : "¿Listo para grabar?"}</h2>
             <p>
               {closed
-                ? "El jurado anunciará la fecha de resultados."
+                ? "Próximamente estaremos avisando. Únete al grupo de WhatsApp para enterarte primero."
                 : "¡Fecha extendida! Participa hasta el domingo 25 de octubre."}
             </p>
           </div>
           {closed ? (
-            <FollowButton label="Sigue los resultados en @peruguitar" />
+            <div className="ctas">
+              <WhatsAppButton />
+              <FollowButton label="Sigue a @peruguitar" />
+            </div>
           ) : (
             <a className="btn btn-primary" href={TRACK_URL} download={TRACK_FILENAME}>
               <ArrowDownToLine aria-hidden="true" />
