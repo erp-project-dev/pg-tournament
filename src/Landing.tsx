@@ -127,6 +127,9 @@ const PARTICIPANTS = [
   { user: "miguelhinostroza1", name: "Miguel Hinostroza", reel: "https://www.instagram.com/p/De7uTT-K1_C/" },
   { user: "rockshua28", name: "Jordan", reel: "https://www.instagram.com/p/De72CA_Brdl/" },
   { user: "miguel.sandovalgarcia", name: "Miguel", reel: "https://www.instagram.com/p/De74tBmp0Ne/" },
+  { user: "diegolacua", name: "Diego", reel: "https://www.instagram.com/p/De8aOuBgZ1n/" },
+  { user: "eins.miutter", name: "Ari", reel: "https://www.instagram.com/p/De8ccH5Nkdx/" },
+  { user: "fritz.tadeo", name: "Fritz", reel: "https://www.instagram.com/p/De8c3tjBWe-/" },
 ];
 
 const TERMS = [
