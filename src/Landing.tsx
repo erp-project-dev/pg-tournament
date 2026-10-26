@@ -125,6 +125,8 @@ const PARTICIPANTS = [
   { user: "jhon.andrsn", name: "Jhon", reel: "https://www.instagram.com/p/De5qsh2Oqis/" },
   { user: "danny_guevara_vela", name: "Danny Guevara", reel: "https://www.instagram.com/p/De6GY2nO2ya/" },
   { user: "miguelhinostroza1", name: "Miguel Hinostroza", reel: "https://www.instagram.com/p/De7uTT-K1_C/" },
+  { user: "rockshua28", name: "Jordan", reel: "https://www.instagram.com/p/De72CA_Brdl/" },
+  { user: "miguel.sandovalgarcia", name: "Miguel", reel: "https://www.instagram.com/p/De74tBmp0Ne/" },
 ];
 
 const TERMS = [
