@@ -130,6 +130,7 @@ const PARTICIPANTS = [
   { user: "diegolacua", name: "Diego", reel: "https://www.instagram.com/p/De8aOuBgZ1n/" },
   { user: "eins.miutter", name: "Ari", reel: "https://www.instagram.com/p/De8ccH5Nkdx/" },
   { user: "fritz.tadeo", name: "Fritz", reel: "https://www.instagram.com/p/De8c3tjBWe-/" },
+  { user: "diego_llallire", name: "Diego", reel: "https://www.instagram.com/reels/De8ehPLu6hp/" },
 ];
 
 const TERMS = [
